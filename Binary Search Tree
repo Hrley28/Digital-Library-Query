@@ -1,1 +1,96 @@
+class Node {
+    public $data;
+    public $left;
+    public $right;
+    public function __construct($data) {
+        $this->data = $data;
+        $this->left = null;
+        $this->right = null;
+    }
+}
 
+class BinarySearchTree {
+    public $root;
+    public function __construct() {
+        $this->root = null;
+    }
+    public function insert($data) {
+        $this->root = $this->insertRec($this->root, $data);
+    }
+    private function insertRec($node, $data) {
+        if ($node === null) return new Node($data);
+        if (strcasecmp($data, $node->data) < 0) {
+            $node->left = $this->insertRec($node->left, $data);
+        } elseif (strcasecmp($data, $node->data) > 0) {
+            $node->right = $this->insertRec($node->right, $data);
+        }
+        return $node;
+    }
+    public function search($data) {
+        return $this->searchRec($this->root, $data);
+    }
+    private function searchRec($node, $data) {
+        if ($node === null) return false;
+        $cmp = strcasecmp($data, $node->data);
+        if ($cmp === 0) return true;
+        return $cmp < 0 ? $this->searchRec($node->left, $data) : $this->searchRec($node->right, $data);
+    }
+    public function inorderTraversal($node, &$result = []) {
+        if ($node !== null) {
+            $this->inorderTraversal($node->left, $result);
+            $result[] = $node->data;
+            $this->inorderTraversal($node->right, $result);
+        }
+        return $result;
+    }
+}
+
+$bst = new BinarySearchTree();
+$allBooks = [
+    "A Brief History of Time",
+    "Becoming",
+    "Gone Girl",
+    "Harry Potter",
+    "Sherlock Holmes",
+    "The Hobbit"
+];
+foreach ($allBooks as $b) $bst->insert($b);
+
+if (php_sapi_name() === 'cli') {
+    echo "Inorder Traversal (Alphabetical):\n";
+    echo implode("\n", $bst->inorderTraversal($bst->root)) . "\n";
+} else {
+    echo "<div class='section'><h3>BST Demo</h3>";
+    echo "<strong>Inorder Traversal (Alphabetical):</strong><br>";
+    echo implode("<br>", $bst->inorderTraversal($bst->root));
+    echo "<br><br>Searching for 'The Hobbit': " . ($bst->search("The Hobbit") ? "<strong>Found!</strong>" : "Not Found.");
+    echo "<br>Searching for 'Inferno': " . ($bst->search("Inferno") ? "<strong>Found!</strong>" : "Not Found.");
+    echo "</div>";
+}
+
+if (php_sapi_name() !== 'cli') {
+    echo "<hr><div class='section'><h3>Integrated Example</h3>";
+    echo "<div class='integrated'>";
+    echo "<div class='panel'>";
+    echo "<h4>Library (Recursive)</h4>";
+    displayLibrary($library);
+    echo "</div>";
+
+    echo "<div class='panel'>";
+    echo "<h4>Lookup Book Details</h4>";
+    $q = isset($_GET['title']) ? $_GET['title'] : null;
+    if ($q) {
+        $info = getBookInfo($q, $bookInfo);
+        if ($info) {
+            echo "<pre>" . htmlspecialchars($info) . "</pre>";
+        } else {
+            echo "<strong>Book not found</strong>";
+        }
+    } else {
+        echo "<em>Provide ?title=Book+Title in the URL to lookup details.</em>";
+    }
+
+    echo "<h4>All Titles (Alphabetical)</h4>";
+    echo implode("<br>", $bst->inorderTraversal($bst->root));
+    echo "</div></div></div>";
+}
