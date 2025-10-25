@@ -1,0 +1,76 @@
+// ========== BST ==========
+class Node {
+    public $data;
+    public $left;
+    public $right;
+    public function __construct($data) { $this->data = $data; }
+}
+class BST {
+    public $root = null;
+    private function insertRec($node, $data) {
+        if (!$node) return new Node($data);
+        if ($data < $node->data) $node->left = $this->insertRec($node->left, $data);
+        elseif ($data > $node->data) $node->right = $this->insertRec($node->right, $data);
+        return $node;
+    }
+    public function insert($data) {
+        $this->root = $this->insertRec($this->root, $data);
+    }
+    private function inorder($node, &$arr) {
+        if ($node) {
+            $this->inorder($node->left, $arr);
+            $arr[] = $node->data;
+            $this->inorder($node->right, $arr);
+        }
+    }
+    public function getInorder() {
+        $arr = [];
+        $this->inorder($this->root, $arr);
+        return $arr;
+    }
+}
+
+$bst = new BST();
+foreach ($bookInfo as $title => $info) $bst->insert($title);
+$booksSorted = $bst->getInorder();
+
+$result = "";
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['book_title'])) {
+    $title = trim($_POST['book_title']);
+    $result = getBookInfoHTML($title, $bookInfo);
+}
+
+// ======= CRUD Operations =======
+if (isset($_POST['action'])) {
+    $action = $_POST['action'];
+    $title = trim($_POST['title']);
+    $author = trim($_POST['author']);
+    $year = trim($_POST['year']);
+    $genre = trim($_POST['genre']);
+
+    switch ($action) {
+        case 'create':
+            if (!isset($_SESSION['bookInfo'][$title])) {
+                $_SESSION['bookInfo'][$title] = [
+                    'author' => $author,
+                    'year' => $year,
+                    'genre' => $genre
+                ];
+            }
+            break;
+        case 'update':
+            if (isset($_SESSION['bookInfo'][$title])) {
+                $_SESSION['bookInfo'][$title] = [
+                    'author' => $author,
+                    'year' => $year,
+                    'genre' => $genre
+                ];
+            }
+            break;
+        case 'delete':
+            unset($_SESSION['bookInfo'][$title]);
+            break;
+    }
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
