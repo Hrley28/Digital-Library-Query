@@ -1,0 +1,20 @@
+function displayLibrary($library) {
+    echo '<ul class="list-group">';
+    foreach ($library as $category => $items) {
+        echo '<li class="list-group-item">';
+        echo "<strong>$category</strong>";
+        if (is_array($items)) {
+            echo '<div class="ms-3 mt-2">';
+            if (array_values($items) === $items) {
+                foreach ($items as $book) {
+                    echo "<p class='mb-1 text-secondary'><i class='bi bi-book'></i> $book</p>";
+                }
+            } else {
+                displayLibrary($items);
+            }
+            echo '</div>';
+        }
+        echo '</li>';
+    }
+    echo '</ul>';
+}
