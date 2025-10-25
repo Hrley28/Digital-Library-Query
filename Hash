@@ -1,0 +1,16 @@
+function getBookInfoHTML($title, $bookInfo) {
+    if (isset($bookInfo[$title])) {
+        $info = $bookInfo[$title];
+        return "
+        <div class='card mb-3 border-0 shadow-sm'>
+            <div class='card-body'>
+                <h5 class='card-title'>$title</h5>
+                <p><strong>Author:</strong> {$info['author']}</p>
+                <p><strong>Year:</strong> {$info['year']}</p>
+                <p><strong>Genre:</strong> {$info['genre']}</p>
+            </div>
+        </div>";
+    } else {
+        return "<div class='alert alert-warning'>Book not found.</div>";
+    }
+}
